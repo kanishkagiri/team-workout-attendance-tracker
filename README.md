@@ -1,7 +1,4 @@
 # team-workout-attendance-tracker
-
-# Team Workout & Attendance Tracker
-
 A full-stack web application designed to help coaches manage team members, schedule training sessions, and track attendance efficiently.
 
 
