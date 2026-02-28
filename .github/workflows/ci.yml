@@ -20,10 +20,13 @@ jobs:
           echo "Backend build successful"
 
       - name: Stage 3 - Build and Push Docker Image
+        env:
+          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-backend ./backend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-backend
+          echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+          docker build -t "$DOCKER_USER/workout-tracker-backend" ./backend
+          docker push "$DOCKER_USER/workout-tracker-backend"
 
   frontend:
     runs-on: ubuntu-latest
@@ -39,7 +42,10 @@ jobs:
           echo "Frontend build successful"
 
       - name: Stage 3 - Build and Push Docker Image
+        env:
+          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-frontend ./frontend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-frontend
+          echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+          docker build -t "$DOCKER_USER/workout-tracker-frontend" ./frontend
+          docker push "$DOCKER_USER/workout-tracker-frontend"
