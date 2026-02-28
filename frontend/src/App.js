@@ -9,6 +9,7 @@ import SessionList from "./components/SessionList";
 import SessionDetails from "./components/SessionDetails";
 import AttendanceForm from "./components/AttendanceForm";
 import AttendanceList from "./components/AttendanceList";
+import Reports from "./components/Reports";
 
 function App() {
   const [members, setMembers] = useState([]);
@@ -63,6 +64,7 @@ function App() {
       case "session-details": return "Session Details";
       case "attendance-add": return "Mark Attendance";
       case "attendance-view": return "View Attendance";
+      case "reports": return "Weekly Report";
       default: return "Dashboard";
     }
   };
@@ -118,6 +120,15 @@ function App() {
           onClick={() => setActivePage("attendance-view")}
         >
           View Attendance
+        </button>
+
+        <p style={{ color: "#94a3b8", fontSize: "12px", padding: "0 16px", marginTop: "16px" }}>REPORTS</p>
+        <button
+          type="button"
+          className={`nav-btn ${activePage === "reports" ? "active" : ""}`}
+          onClick={() => setActivePage("reports")}
+        >
+          Weekly Report
         </button>
       </aside>
 
@@ -186,6 +197,10 @@ function App() {
             records={attendanceRecords}
             setRecords={setAttendanceRecords}
           />
+        )}
+
+        {activePage === "reports" && (
+          <Reports />
         )}
       </main>
 
