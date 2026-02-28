@@ -4,18 +4,22 @@ import API from "./services/api";
 import MemberForm from "./components/MemberForm";
 import MemberList from "./components/MemberList";
 import EditModal from "./components/EditModal";
+import SessionForm from "./components/SessionForm";
+import SessionList from "./components/SessionList";
+import SessionDetails from "./components/SessionDetails";
 
 function App() {
   const [members, setMembers] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [activePage, setActivePage] = useState("dashboard");
   const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchMembers = async () => {
     try {
       setLoading(true);
       const res = await API.get("/members");
-
       if (Array.isArray(res.data)) {
         setMembers(res.data);
       } else if (Array.isArray(res.data.members)) {
@@ -31,15 +35,38 @@ function App() {
     }
   };
 
+  const fetchSessions = async () => {
+    try {
+      const res = await API.get("/sessions");
+      setSessions(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      console.error("Error fetching sessions:", error);
+      setSessions([]);
+    }
+  };
+
   useEffect(() => {
     fetchMembers();
+    fetchSessions();
   }, []);
+
+  const getPageTitle = () => {
+    switch (activePage) {
+      case "dashboard": return "Dashboard";
+      case "add": return "Add Member";
+      case "sessions": return "Sessions";
+      case "add-session": return "Create Session";
+      case "session-details": return "Session Details";
+      default: return "Dashboard";
+    }
+  };
 
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <h2 className="sidebar-title">Team Tracker</h2>
 
+        <p style={{ color: "#94a3b8", fontSize: "12px", padding: "0 16px", marginTop: "16px" }}>MEMBERS</p>
         <button
           type="button"
           className={`nav-btn ${activePage === "dashboard" ? "active" : ""}`}
@@ -47,7 +74,6 @@ function App() {
         >
           Dashboard
         </button>
-
         <button
           type="button"
           className={`nav-btn ${activePage === "add" ? "active" : ""}`}
@@ -55,14 +81,30 @@ function App() {
         >
           Add Member
         </button>
+
+        <p style={{ color: "#94a3b8", fontSize: "12px", padding: "0 16px", marginTop: "16px" }}>SESSIONS</p>
+        <button
+          type="button"
+          className={`nav-btn ${activePage === "sessions" ? "active" : ""}`}
+          onClick={() => setActivePage("sessions")}
+        >
+          All Sessions
+        </button>
+        <button
+          type="button"
+          className={`nav-btn ${activePage === "add-session" ? "active" : ""}`}
+          onClick={() => setActivePage("add-session")}
+        >
+          Create Session
+        </button>
       </aside>
 
       <main className="main-content">
         <div className="page-header">
-          <h1>{activePage === "dashboard" ? "Dashboard" : "Add Member"}</h1>
+          <h1>{getPageTitle()}</h1>
         </div>
 
-        {loading && <p className="status-text">Loading members...</p>}
+        {loading && <p className="status-text">Loading...</p>}
 
         {!loading && activePage === "dashboard" && (
           <MemberList
@@ -76,6 +118,30 @@ function App() {
           <MemberForm
             fetchMembers={fetchMembers}
             goToDashboard={() => setActivePage("dashboard")}
+          />
+        )}
+
+        {activePage === "sessions" && (
+          <SessionList
+            sessions={sessions}
+            onSelectSession={(session) => {
+              setSelectedSession(session);
+              setActivePage("session-details");
+            }}
+          />
+        )}
+
+        {activePage === "add-session" && (
+          <SessionForm
+            fetchSessions={fetchSessions}
+            goToDashboard={() => setActivePage("sessions")}
+          />
+        )}
+
+        {activePage === "session-details" && (
+          <SessionDetails
+            session={selectedSession}
+            onBack={() => setActivePage("sessions")}
           />
         )}
       </main>
