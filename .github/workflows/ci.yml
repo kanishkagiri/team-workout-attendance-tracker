@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stage 1 - Clone Repository
+        uses: actions/checkout@v3
+
+      - name: Stage 2 - Build Backend
+        working-directory: ./backend
+        run: |
+          npm install
+          echo "Backend build successful"
+
+      - name: Stage 3 - Build Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-backend ./backend
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-backend
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stage 1 - Clone Repository
+        uses: actions/checkout@v3
+
+      - name: Stage 2 - Build Frontend
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm run build
+          echo "Frontend build successful"
+
+      - name: Stage 3 - Build Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-frontend ./frontend
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-frontend
