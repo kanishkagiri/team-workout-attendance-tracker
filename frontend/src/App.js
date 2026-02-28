@@ -7,6 +7,7 @@ import EditModal from "./components/EditModal";
 import SessionForm from "./components/SessionForm";
 import SessionList from "./components/SessionList";
 import SessionDetails from "./components/SessionDetails";
+import Reports from "./components/Reports";
 
 function App() {
   const [members, setMembers] = useState([]);
@@ -57,6 +58,7 @@ function App() {
       case "sessions": return "Sessions";
       case "add-session": return "Create Session";
       case "session-details": return "Session Details";
+      case "reports": return "Weekly Report";
       default: return "Dashboard";
     }
   };
@@ -96,6 +98,15 @@ function App() {
           onClick={() => setActivePage("add-session")}
         >
           Create Session
+        </button>
+
+        <p style={{ color: "#94a3b8", fontSize: "12px", padding: "0 16px", marginTop: "16px" }}>REPORTS</p>
+        <button
+          type="button"
+          className={`nav-btn ${activePage === "reports" ? "active" : ""}`}
+          onClick={() => setActivePage("reports")}
+        >
+          Weekly Report
         </button>
       </aside>
 
@@ -143,6 +154,10 @@ function App() {
             session={selectedSession}
             onBack={() => setActivePage("sessions")}
           />
+        )}
+
+        {activePage === "reports" && (
+          <Reports />
         )}
       </main>
 
