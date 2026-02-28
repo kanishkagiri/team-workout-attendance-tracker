@@ -7,6 +7,8 @@ import EditModal from "./components/EditModal";
 import SessionForm from "./components/SessionForm";
 import SessionList from "./components/SessionList";
 import SessionDetails from "./components/SessionDetails";
+import AttendanceForm from "./components/AttendanceForm";
+import AttendanceList from "./components/AttendanceList";
 import Reports from "./components/Reports";
 
 function App() {
@@ -15,6 +17,8 @@ function App() {
   const [activePage, setActivePage] = useState("dashboard");
   const [selectedMember, setSelectedMember] = useState(null);
   const [selectedSession, setSelectedSession] = useState(null);
+  const [attendanceRecords, setAttendanceRecords] = useState([]);
+  const [selectedAttendanceSessionId, setSelectedAttendanceSessionId] = useState("");
   const [loading, setLoading] = useState(true);
 
   const fetchMembers = async () => {
@@ -58,6 +62,8 @@ function App() {
       case "sessions": return "Sessions";
       case "add-session": return "Create Session";
       case "session-details": return "Session Details";
+      case "attendance-add": return "Mark Attendance";
+      case "attendance-view": return "View Attendance";
       case "reports": return "Weekly Report";
       default: return "Dashboard";
     }
@@ -98,6 +104,22 @@ function App() {
           onClick={() => setActivePage("add-session")}
         >
           Create Session
+        </button>
+
+        <p style={{ color: "#94a3b8", fontSize: "12px", padding: "0 16px", marginTop: "16px" }}>ATTENDANCE</p>
+        <button
+          type="button"
+          className={`nav-btn ${activePage === "attendance-add" ? "active" : ""}`}
+          onClick={() => setActivePage("attendance-add")}
+        >
+          Mark Attendance
+        </button>
+        <button
+          type="button"
+          className={`nav-btn ${activePage === "attendance-view" ? "active" : ""}`}
+          onClick={() => setActivePage("attendance-view")}
+        >
+          View Attendance
         </button>
 
         <p style={{ color: "#94a3b8", fontSize: "12px", padding: "0 16px", marginTop: "16px" }}>REPORTS</p>
@@ -153,6 +175,27 @@ function App() {
           <SessionDetails
             session={selectedSession}
             onBack={() => setActivePage("sessions")}
+          />
+        )}
+
+        {activePage === "attendance-add" && (
+          <AttendanceForm
+            members={members}
+            sessions={sessions}
+            onSaved={(sessionId) => {
+              setSelectedAttendanceSessionId(sessionId);
+              setActivePage("attendance-view");
+            }}
+          />
+        )}
+
+        {activePage === "attendance-view" && (
+          <AttendanceList
+            sessions={sessions}
+            selectedSessionId={selectedAttendanceSessionId}
+            setSelectedSessionId={setSelectedAttendanceSessionId}
+            records={attendanceRecords}
+            setRecords={setAttendanceRecords}
           />
         )}
 
