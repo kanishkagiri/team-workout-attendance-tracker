@@ -19,10 +19,10 @@ jobs:
           npm install
           echo "Backend build successful"
 
-      - name: Stage 3 - Build Docker Image
+      - name: Stage 3 - Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-backend ./backend
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-backend ./backend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-backend
 
   frontend:
@@ -38,8 +38,8 @@ jobs:
           npm run build
           echo "Frontend build successful"
 
-      - name: Stage 3 - Build Docker Image
+      - name: Stage 3 - Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-frontend ./frontend
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-frontend ./frontend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/workout-tracker-frontend
