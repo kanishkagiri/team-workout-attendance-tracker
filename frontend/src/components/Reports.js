@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import API from "../services/api";
 
 function Reports() {
@@ -13,7 +13,7 @@ function Reports() {
     return new Date().toISOString().split("T")[0];
   });
 
-  const fetchReport = async () => {
+  const fetchReport = useCallback(async () => {
     try {
       setLoading(true);
       const res = await API.get(`/reports/weekly?startDate=${startDate}&endDate=${endDate}`);
@@ -23,43 +23,26 @@ function Reports() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [startDate, endDate]);
 
   useEffect(() => {
     fetchReport();
-  }, []);
+  }, [fetchReport]);
 
   return (
     <div>
-      {/* Date Filter */}
       <section className="card" style={{ marginBottom: "20px" }}>
         <h3>Filter by Date Range</h3>
         <div style={{ display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
           <div>
             <label>Start Date</label><br />
-            <input
-              type="date"
-              value={startDate}
-              onChange={e => setStartDate(e.target.value)}
-              style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }}
-            />
+            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }} />
           </div>
           <div>
             <label>End Date</label><br />
-            <input
-              type="date"
-              value={endDate}
-              onChange={e => setEndDate(e.target.value)}
-              style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }}
-            />
+            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }} />
           </div>
-          <button
-            className="btn btn-primary"
-            onClick={fetchReport}
-            style={{ marginTop: "20px" }}
-          >
-            Generate Report
-          </button>
+          <button className="btn btn-primary" onClick={fetchReport} style={{ marginTop: "20px" }}>Generate Report</button>
         </div>
       </section>
 
@@ -67,7 +50,6 @@ function Reports() {
 
       {report && (
         <>
-          {/* Summary Cards */}
           <div style={{ display: "flex", gap: "16px", marginBottom: "20px", flexWrap: "wrap" }}>
             <div className="card" style={{ flex: 1, textAlign: "center", background: "#1e293b", color: "white" }}>
               <h2 style={{ fontSize: "36px", margin: "10px 0" }}>{report.totalSessions}</h2>
@@ -83,7 +65,6 @@ function Reports() {
             </div>
           </div>
 
-          {/* Attendance Chart - CSS bars */}
           <section className="card" style={{ marginBottom: "20px" }}>
             <h3>Attendance by Member</h3>
             {report.memberReport.length === 0 ? (
@@ -96,20 +77,13 @@ function Reports() {
                     <span>{member.present}/{member.total} sessions ({member.percentage}%)</span>
                   </div>
                   <div style={{ background: "#e2e8f0", borderRadius: "999px", height: "12px" }}>
-                    <div style={{
-                      width: `${member.percentage}%`,
-                      background: member.percentage >= 75 ? "#16a34a" : member.percentage >= 50 ? "#f59e0b" : "#dc2626",
-                      height: "12px",
-                      borderRadius: "999px",
-                      transition: "width 0.5s"
-                    }} />
+                    <div style={{ width: `${member.percentage}%`, background: member.percentage >= 75 ? "#16a34a" : member.percentage >= 50 ? "#f59e0b" : "#dc2626", height: "12px", borderRadius: "999px" }} />
                   </div>
                 </div>
               ))
             )}
           </section>
 
-          {/* Sessions Table */}
           <section className="card">
             <h3>Sessions This Period</h3>
             {report.sessions.length === 0 ? (
